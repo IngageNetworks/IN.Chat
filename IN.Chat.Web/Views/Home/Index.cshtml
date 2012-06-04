@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "Chat";
+}
+@section css{
+    <link rel="stylesheet" type="text/css" href="~/Content/chat.emoji.css" />
+}
+@section jsbody{
+    <script type="text/javascript" src="~/Scripts/jquery.signalR-0.5.0.min.js"></script>
+    <script type="text/javascript" src="~/signalr/hubs"></script>
+    <script type="text/javascript" src="~/Scripts/chat.js"></script>
+    <script type="text/javascript" src="~/Scripts/chat.util.js"></script>
+    <script type="text/javascript" src="~/Scripts/chat.emoji.js"></script>
+    <script type="text/javascript" src="~/Scripts/jQuery.tmpl.min.js"></script>
+}
+
+<div class="row-fluid">
+    <div class="row-fluid span8">
+        <div id="chat-messages" class="well" class="row-fluid span12 well">
+            <div id="chat-messages-old"><div class="alert alert-info alert-block"><a class="close" data-dismiss="alert" href="#">×</a>Loading previous messages...</div><hr /></div>
+            <div id="chat-messages-new"></div>
+        </div>
+        <textarea style="resize: none;height: 1.5em;" class="row-fluid span12" id="chat-input" placeholder="start typing..."></textarea>
+        <p><small id="chat-tips">&nbsp;</small></p>
+    </div>
+    <div class="row-fluid span4">
+        <div id="chat-users" class="well"></div>
+    </div>
+</div>
+<hr />
+<div class="row-fluid">
+    <div class="page-header">
+        <h1>Getting Started</h1>
+    </div>
+    <div id="Usage-Basic" class="span12">
+        <div class="page-header">
+            <h2>Basic <small>For beginners</small></h2>
+        </div>
+        <div class="span12">
+            <div class="span6">
+                <h3>Private Messages</h3>
+                <p>Just like twitter, use <code>@@username &lt;message&gt;</code> to privately message somebody. Your private messages will only be visible to the recipient, and you.</p>
+            </div>
+            <div class="span6">
+                <h3>Emojis</h3>
+                <p>Your typed emoticons will automatically be converted into the emoji image. This <code>:)</code> automatically becomes <code><span class="emoji20 emoji20-smile" alt="smile" title="smile"></span></code>.</p>
+            </div>
+        </div>
+        <div class="span12">
+            <div class="span6">
+                <div id="contentproviders">
+                    <h3>Content Providers</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="Usage-Advanced" class="span12">
+        <div class="page-header">
+            <h2>Advanced <small>Become a power-user</small></h2>
+        </div>
+        <div class="span6">
+            <div id="commands">
+                <h3>Commands <small>Useful, sometimes entertaining.</small></h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="About" class="row-fluid" class="span12">
+    <div class="page-header">
+        <h1>About <small>For the nerds</small></h1>
+    </div>
+    <h3>The Technology</h3>
+    <dl class="dl-horizontal">
+        <dt>Frontend</dt><dd><a href="http://www.asp.net/mvc">ASP.NET MVC 3</a>, <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a>, & <a href="http://jquery.com">jQuery</a>. Icons from <a href="http://glyphicons.com/">Glyphicons Free</a>.</dd>
+        <dt>Backend</dt><dd><a href="https://github.com/SignalR/SignalR">SignalR</a>, <a href="http://redistogo.com/">Redis To Go</a>, & <a href="http://nlog-project.org/">NLog</a> + <a href="https://logentries.com">logentries</a></dd>
+    </dl>
+    <h3>APIs</h3>
+    <dl class="dl-horizontal">
+        <dt>Authentication</dt><dd><a href="http://developer.ingagenetworks.com/">INgage Networks's API</a></dd>
+        <dt>CI Command</dt><dd>Jenkins's API</dd>
+        <dt>Face Me Command</dt><dd>http://stacheable.herokuapp.com & <a href="http://faceup.me">http://faceup.me</a></dd>
+        <dt>Rally Command</dt><dd><a href="http://developer.rallydev.com">Rally's API</a></dd>
+        <dt>Stock Command</dt><dd>Yahoo's Finance API</dd>
+        <dt>Weather Command</dt><dd>Google's Weather API</dd>
+    </dl>
+</div>

@@ -1,0 +1,50 @@
+﻿#chat-messages
+{
+    height: 500px;
+    overflow: auto;
+}
+
+#chat-users
+{
+    height: 500px;
+    overflow: auto;
+}
+
+.brand,
+.hero-unit h1
+{
+    font-family: 'Kaushan Script', cursive;
+}
+
+.navbar .brand
+{
+    color: White;  
+}
+
+.alert-default
+{
+    color: Black;
+    background-color: whiteSmoke;
+    border-color: #ccc;
+}
+
+#footer .brand
+{
+    font-size: 20px;   
+}
+
+#footer a.backtotop
+{
+    float: right; 
+}
+
+.private-message
+{
+    color: #9d261d;
+}
+
+pre.prettyprint 
+{
+    padding: 8.5px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}

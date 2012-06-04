@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chat">
+    <meta name="author" content="Bates Westmoreland">
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.css" />
+    <style> body { padding-top: 60px; } </style>
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-responsive.css" />
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    @RenderSection("css", false)
+    <link rel="stylesheet" type="text/css" href="~/Content/Site.css" />
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Kaushan+Script' />
+    @RenderSection("jshead", false)
+    <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAI9SURBVFhH1dY7axRRFAfwBTsRS8HCQrGwEcFK1NJHpSiC+hX8AD5qBQst/BYWKoriI6LGJL7iNiqJJtHCQoNiQrLz2J1kZnaP53/kn+Iulxl3hYsHfoQkd4Yz/9175jakZiVFT+D+j9x8ikszbDXq3iBYA7E+NewfT0zj9rLZcK9lni8UZtCqTCB4A5NLpQCf3P155l1HYNCqTCB4AwurPYHtjyPjJnBrPhcYtCoTCN4An4z7/vJcJjDyszDDVmUCwRoY070Nu57FZvfoH0t5z1z5vGL26WwAJuNL5NxUR2DvWGLet0rjTSBYA3NJV2Dzw8i43/oZnf9wfDI1/P+6O8sCTZ0Z4Nahl4kA13OC9iUQrIFF3euw82lsfJNvVtOB0822cdft0c8X9PVhWEffpAJcP7FYCKwlEKyBtOwJHH6VGHZ4TLsFdwIygVPNVIDrdzyJBfj7tS8rApUJBG/gwnQmwM653zmC3SdjAiffpgK87ub3XGDLo8jwvDCfdQXcxNa+A8EbmIpKgYO6R+GDTidgbR2JBPikvgR43Q1NAbieu+WEzgzo2wXBG/DN7o7uDNimZwCoSuCF7mlgHdA0gddt1PMjeOeA28h/18C4vjmB9VHfF7D+bsu4E7NvEg6bwD9voK2fP2x60DJ8Ap6MjrxOBfj30V+FgFuXZjMBNwHv25A3CN5A3hWBq3rqgfPTHcMJef3bqsBZPeXA13bX+D7KizOZAO/D9d4TUfAGhj3t1r2+9qm47g3/dt1v78UIO36N8YsAAAAASUVORK5CYII=" />
+</head>
+<body>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <span class="brand">Chat</span>
+                @if (User.Identity.IsAuthenticated)
+                { 
+                <div class="btn-group pull-right">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="icon-user"></i>
+                        <span id="navbar-username">@User.Identity.Name</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/logout"><i class="icon-pencil"></i>signout</a></li>
+                    </ul>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div id="content" class="container">
+        @RenderBody()
+    </div>
+    <div id="footer" class="container">
+        <hr />
+        <br />
+        <div class="row-fluid">
+            <div class="span10">
+                <span class="brand">Chat</span><br />
+                Bates Westmoreland<br />
+                Hack-a-thon 0001<br />
+            </div>
+            <div class="span2"><a class="backtotop" href="#">Back to top</a></div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+    <script type="text/javascript" src="~/Scripts/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.min.js"></script>
+    @RenderSection("jsbody", false)
+</body>
+</html>

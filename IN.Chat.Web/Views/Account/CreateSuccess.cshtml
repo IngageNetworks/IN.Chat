@@ -1,0 +1,12 @@
+﻿@model IN.Chat.Web.Models.Account.CreateModel
+@{
+    ViewBag.Title = "Account Created";
+}
+
+<div>
+    <div class="page-header">
+        <h1>Account Created!</h1>
+    </div>
+    <p>You may now sign in using your new account!</p>
+    <p><a class="btn btn-primary btn-large" href="@Url.RouteUrl("Login")">Back to Login</a></p>
+</div>

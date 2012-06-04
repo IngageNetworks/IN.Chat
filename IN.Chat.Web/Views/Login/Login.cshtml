@@ -1,0 +1,20 @@
+﻿@model IN.Chat.Web.Models.Credentials.CredentialsModel
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="hero-unit">
+    <h1>Chat</h1>
+    <p>Join the conversation, with your colleagues.</p>
+    @using (Html.BeginForm("Login", "Home", FormMethod.Post, new { @class = "form-inline" }))
+    {
+        @Html.TextBoxFor(m => m.Username, new { placeholder = "username" })
+        @Html.PasswordFor(m => m.Password, new { placeholder = "password" })
+        <button class="btn btn-primary" type="submit">Login</button>
+        <a class="btn" href="@Url.RouteUrl("Account - Create")">Create an Account</a>
+    }
+</div>
+@if (!Html.ViewData.ModelState.IsValid)
+{
+    @Html.ValidationSummary("", new { @class = "alert alert-error alert-block" })
+}

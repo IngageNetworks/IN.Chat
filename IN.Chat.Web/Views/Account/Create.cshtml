@@ -1,0 +1,53 @@
+﻿@model IN.Chat.Web.Models.Account.CreateModel
+@{
+    ViewBag.Title = "Create Account";
+}
+
+<div>
+    <div class="page-header">
+        <h1>Create an Account</h1>
+    </div>
+    <p>
+    @using (Html.BeginForm("Create", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div class="control-group">
+            @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.FirstName, new { placeholder = "first name" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.LastName, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.LastName, new { placeholder = "last name" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.EmailAddress, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.EmailAddress, new { placeholder = "example@example.com" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.Username, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.Username, new { placeholder = "username" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+            <div class="controls">
+                @Html.PasswordFor(m => m.Password, new { placeholder = "password" })
+            </div>
+        </div>
+        <div class="form-actions">
+            <a class="btn btn-large" href="@Url.RouteUrl("Login")">Back to Login</a>
+            <button class="btn btn-primary btn-large" type="submit">Create!</button>
+        </div>
+    }
+    </p>
+</div>
+@if (!Html.ViewData.ModelState.IsValid)
+{
+    @Html.ValidationSummary("", new { @class = "alert alert-error alert-block" })
+}
