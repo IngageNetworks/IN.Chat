@@ -1,6 +1,6 @@
 Chat
 ===
-Chat is an example chat application built on top of the INgage Platform
+An example chat application built on top of the INgage Enterprise Platform
 
 Getting Started
 ---
