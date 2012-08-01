@@ -17,7 +17,7 @@ namespace IN.Chat.Web.Controllers
     {
         private static string INAPIKEY = ConfigurationManager.AppSettings["in_apikey"];
         private static string INACCESSTOKEN = ConfigurationManager.AppSettings["in_accesstoken"];
-        private static string INUSERSCREATESURL = ConfigurationManager.AppSettings["in_users_create_url"];
+        private static string INUSERSCREATEURL = ConfigurationManager.AppSettings["in_users_create_url"];
         private static string INUSERSSECURITYQUESTIONSURL = ConfigurationManager.AppSettings["in_users_securityquestions_url"];
 
         [HttpGet]
@@ -85,7 +85,7 @@ namespace IN.Chat.Web.Controllers
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(INUSERSCREATESURL) && !string.IsNullOrWhiteSpace(INAPIKEY))
+                if (!string.IsNullOrWhiteSpace(INUSERSCREATEURL) && !string.IsNullOrWhiteSpace(INAPIKEY))
                 {
                     var requestBody = new
                     {
@@ -132,7 +132,7 @@ namespace IN.Chat.Web.Controllers
                     httpClient.DefaultRequestHeaders.Add("api-key", INAPIKEY);
                     httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", INACCESSTOKEN);
                     var httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-                    var result = httpClient.PostAsync(INUSERSCREATESURL, httpContent).Result;
+                    var result = httpClient.PostAsync(INUSERSCREATEURL, httpContent).Result;
 
                     if (result.IsSuccessStatusCode)
                     {
