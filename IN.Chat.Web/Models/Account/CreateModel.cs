@@ -37,7 +37,7 @@ namespace IN.Chat.Web.Models.Account
         [Required]
         public string QuestionOneId { get; set; }
 
-        [Display(Name = "Question One Answer")]
+        [Display(Name = "Answer One")]
         [Required]
         public string QuestionOneAnswer { get; set; }
 
@@ -45,7 +45,7 @@ namespace IN.Chat.Web.Models.Account
         [Required]
         public string QuestionTwoId { get; set; }
 
-        [Display(Name = "Question Two Answer")]
+        [Display(Name = "Answer Two")]
         [Required]
         public string QuestionTwoAnswer { get; set; }
 
@@ -53,7 +53,7 @@ namespace IN.Chat.Web.Models.Account
         [Required]
         public string QuestionThreeId { get; set; }
 
-        [Display(Name = "Question Three Answer")]
+        [Display(Name = "Answer Three")]
         [Required]
         public string QuestionThreeAnswer { get; set; }
 
