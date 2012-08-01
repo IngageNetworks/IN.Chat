@@ -7,9 +7,19 @@
     <div class="page-header">
         <h1>Create an Account</h1>
     </div>
+    @if (!Html.ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-error alert-block">
+            <h4 class="alert-heading">Errors!</h4>
+            @Html.ValidationSummary()
+        </div>
+    }
     <p>
     @using (Html.BeginForm("Create", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
     {
+        <div class="page-header">
+          <h3>Profile</h3>
+        </div>
         <div class="control-group">
             @Html.LabelFor(m => m.FirstName, new { @class = "control-label" })
             <div class="controls">
@@ -28,6 +38,9 @@
                 @Html.TextBoxFor(m => m.EmailAddress, new { placeholder = "example@example.com" })
             </div>
         </div>
+        <div class="page-header">
+          <h3>Credentials</h3>
+        </div>
         <div class="control-group">
             @Html.LabelFor(m => m.Username, new { @class = "control-label" })
             <div class="controls">
@@ -40,6 +53,51 @@
                 @Html.PasswordFor(m => m.Password, new { placeholder = "password" })
             </div>
         </div>
+        <div class="page-header">
+          <h3>Password Recovery</h3>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.Pin, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.Pin, new { placeholder = "pin" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionOneId, new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownListFor(m => m.QuestionOneId, Model.SecurityQuestions.Skip(0).Take(4))
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionOneAnswer, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.QuestionOneAnswer, new { placeholder = "answer" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionTwoId, new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownListFor(m => m.QuestionTwoId, Model.SecurityQuestions.Skip(4).Take(4))
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionTwoAnswer, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.QuestionTwoAnswer, new { placeholder = "answer" })
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionThreeId, new { @class = "control-label" })
+            <div class="controls">
+                @Html.DropDownListFor(m => m.QuestionThreeId, Model.SecurityQuestions.Skip(8).Take(4))
+            </div>
+        </div>
+        <div class="control-group">
+            @Html.LabelFor(m => m.QuestionThreeAnswer, new { @class = "control-label" })
+            <div class="controls">
+                @Html.TextBoxFor(m => m.QuestionThreeAnswer, new { placeholder = "answer" })
+            </div>
+        </div>
         <div class="form-actions">
             <a class="btn btn-large" href="@Url.RouteUrl("Login")">Back to Login</a>
             <button class="btn btn-primary btn-large" type="submit">Create!</button>
@@ -47,7 +105,3 @@
     }
     </p>
 </div>
-@if (!Html.ViewData.ModelState.IsValid)
-{
-    @Html.ValidationSummary("", new { @class = "alert alert-error alert-block" })
-}

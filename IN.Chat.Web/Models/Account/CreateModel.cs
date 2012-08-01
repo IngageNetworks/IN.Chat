@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace IN.Chat.Web.Models.Account
 {
@@ -27,5 +28,35 @@ namespace IN.Chat.Web.Models.Account
         [Display(Name = "Password")]
         [Required]
         public string Password { get; set; }
+
+        [Display(Name = "Pin")]
+        [Required]
+        public string Pin { get; set; }
+
+        [Display(Name = "Question One")]
+        [Required]
+        public string QuestionOneId { get; set; }
+
+        [Display(Name = "Question One Answer")]
+        [Required]
+        public string QuestionOneAnswer { get; set; }
+
+        [Display(Name = "Question Two")]
+        [Required]
+        public string QuestionTwoId { get; set; }
+
+        [Display(Name = "Question Two Answer")]
+        [Required]
+        public string QuestionTwoAnswer { get; set; }
+
+        [Display(Name = "Question Three")]
+        [Required]
+        public string QuestionThreeId { get; set; }
+
+        [Display(Name = "Question Three Answer")]
+        [Required]
+        public string QuestionThreeAnswer { get; set; }
+
+        public IEnumerable<SelectListItem> SecurityQuestions { get; set; }
     }
 }
