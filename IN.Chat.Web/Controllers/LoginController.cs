@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Configuration;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -16,10 +11,6 @@ namespace IN.Chat.Web.Controllers
 {
     public class LoginController : BaseController
     {
-        private static string INAPIKEY = ConfigurationManager.AppSettings["in_apikey"];
-        private static string INAUTHURL = ConfigurationManager.AppSettings["in_auth_url"];
-        private static string INUSERSMESURL = ConfigurationManager.AppSettings["in_users_me_url"];
-
         [HttpGet]
         public ActionResult Login()
         {
@@ -33,7 +24,7 @@ namespace IN.Chat.Web.Controllers
             {
                 string accessToken;
                 string username;
-                if (TryGetAccessToken(model, out accessToken) && TryGetUserName(accessToken, out username))
+                if (TryGetAccessToken(INAUTHURL, INAPIKEY, model, out accessToken) && TryGetUserName(INUSERSMEURL, INAPIKEY, accessToken, out username))
                 {
                     var ticket = new FormsAuthenticationTicket(1, username, DateTime.UtcNow, DateTime.MaxValue, true, accessToken);
                     var encryptedTicket = FormsAuthentication.Encrypt(ticket);
@@ -60,22 +51,19 @@ namespace IN.Chat.Web.Controllers
             return RedirectToRoute("Login");
         }
 
-        private bool TryGetAccessToken(CredentialsModel model, out string accessToken)
+        private static bool TryGetAccessToken(string authUrl, string apiKey, CredentialsModel model, out string accessToken)
         {
             var success = false;
             accessToken = null;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(INAUTHURL) && !string.IsNullOrWhiteSpace(INAPIKEY))
+                using (var httpClient = new HttpClient())
                 {
-                    ServicePointManager.UseNagleAlgorithm = false;
-                    ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
-                    var httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(model.Username + ":" + model.Password)));
+                    httpClient.DefaultRequestHeaders.Authorization = CreateBasicAuthorizationHeader(model.Username, model.Password);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.DefaultRequestHeaders.Add("api-key", INAPIKEY);
-                    var result = httpClient.GetAsync(INAUTHURL).Result;
+                    httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
+                    var result = httpClient.GetAsync(authUrl).Result;
 
                     if (result.IsSuccessStatusCode)
                     {
@@ -97,22 +85,19 @@ namespace IN.Chat.Web.Controllers
             return success;
         }
 
-        private bool TryGetUserName(string accessToken, out string username)
+        private static bool TryGetUserName(string meUrl, string apiKey, string accessToken, out string username)
         {
             var success = false;
             username = null;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(INUSERSMESURL))
+                using (var httpClient = new HttpClient())
                 {
-                    ServicePointManager.UseNagleAlgorithm = false;
-                    ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
-                    var httpClient = new HttpClient();
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.DefaultRequestHeaders.Add("api-key", INAPIKEY);
+                    httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
                     httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", accessToken);
-                    var result = httpClient.GetAsync(INUSERSMESURL).Result;
+                    var result = httpClient.GetAsync(meUrl).Result;
 
                     if (result.IsSuccessStatusCode)
                     {

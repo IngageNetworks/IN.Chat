@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Web.Mvc;
 using IN.Chat.Web.Models.Account;
@@ -15,16 +11,15 @@ namespace IN.Chat.Web.Controllers
 {
     public class AccountController : BaseController
     {
-        private static string INAPIKEY = ConfigurationManager.AppSettings["in_apikey"];
-        private static string INACCESSTOKEN = ConfigurationManager.AppSettings["in_accesstoken"];
-        private static string INUSERSCREATEURL = ConfigurationManager.AppSettings["in_users_create_url"];
-        private static string INUSERSSECURITYQUESTIONSURL = ConfigurationManager.AppSettings["in_users_securityquestions_url"];
-
         [HttpGet]
         public ActionResult Create()
         {
-            var model = new CreateModel();
-            model.SecurityQuestions = GetSecurityQuestions();
+            var accessToken = GetAdminAccessToken(INAUTHURL, INAPIKEY, INADMINUSERNAME, INADMINPASSWORD);
+            var securityQuestions = GetSecurityQuestions(INUSERSSECURITYQUESTIONSURL, INAPIKEY, accessToken);
+            var model = new CreateModel()
+            {
+                SecurityQuestions = securityQuestions
+            };
             return View(model);
         }
 
@@ -33,8 +28,10 @@ namespace IN.Chat.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                var accessToken = GetAdminAccessToken(INAUTHURL, INAPIKEY, INADMINUSERNAME, INADMINPASSWORD);
+
                 string errorMessage;
-                if (TryCreateAccount(model, out errorMessage))
+                if (TryCreateAccount(INUSERSCREATEURL, INAPIKEY, accessToken, model, out errorMessage))
                 {
                     //todo: Email user's credentials
                     return View("CreateSuccess");
@@ -51,88 +48,107 @@ namespace IN.Chat.Web.Controllers
             }
         }
 
-        private static IEnumerable<SelectListItem> GetSecurityQuestions()
+        private static IEnumerable<SelectListItem> GetSecurityQuestions(string securityQuestionsUrl, string apiKey, string accessToken)
         {
             var securityQuestions = new List<SelectListItem>();
 
-            ServicePointManager.UseNagleAlgorithm = false;
-            ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Add("api-key", INAPIKEY);
-            httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", INACCESSTOKEN);
-            var result = httpClient.GetAsync(INUSERSSECURITYQUESTIONSURL).Result.Content.ReadAsStringAsync().Result;
-            var json = JsonConvert.DeserializeObject(result) as dynamic;
-            var questions = json.Entities as IEnumerable<dynamic>;
-
-            foreach (var question in questions)
+            using (var httpClient = new HttpClient())
             {
-                securityQuestions.Add(new SelectListItem() 
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
+                httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", accessToken);
+                var result = httpClient.GetAsync(securityQuestionsUrl).Result.Content.ReadAsStringAsync().Result;
+                var json = JsonConvert.DeserializeObject(result) as dynamic;
+                var questions = json.Entities as IEnumerable<dynamic>;
+
+                foreach (var question in questions)
                 {
-                    Selected = false,
-                    Text = question.Question.Value.ToString(), 
-                    Value = question.Id.Value.ToString()
-                });
+                    securityQuestions.Add(new SelectListItem()
+                    {
+                        Selected = false,
+                        Text = question.Question.Value.ToString(),
+                        Value = question.Id.Value.ToString()
+                    });
+                }
             }
 
             return securityQuestions;
         }
 
-        private static bool TryCreateAccount(CreateModel model, out string errorMessage)
+        private static string GetAdminAccessToken(string authUrl, string apiKey, string username, string password)
+        {
+            var accessToken = string.Empty;
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.Authorization = CreateBasicAuthorizationHeader(username, password);
+                httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
+                var result = httpClient.GetAsync(authUrl).Result;
+
+                if (result.IsSuccessStatusCode)
+                {
+                    var resultBody = result.Content.ReadAsStringAsync().Result;
+                    var json = JsonConvert.DeserializeObject(resultBody) as dynamic;
+                    accessToken = json.AccessToken.Value.ToString();
+                }
+            }
+
+            return accessToken;
+        }
+
+        private static bool TryCreateAccount(string createUserUrl, string apiKey, string accessToken, CreateModel model, out string errorMessage)
         {
             var success = false;
             errorMessage = string.Empty;
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(INUSERSCREATEURL) && !string.IsNullOrWhiteSpace(INAPIKEY))
+                var requestBody = new
                 {
-                    var requestBody = new
+                    Authority = new
                     {
-                        Authority = new
+                        IsTenantAdmin = false,
+                    },
+                    Credentials = new
+                    {
+                        Password = model.Password,
+                        Pin = model.Pin,
+                        SecurityQuestionAnswers = new[] 
                         {
-                            IsTenantAdmin = false,
-                        },
-                        Credentials = new
-                        {
-                            Password = model.Password,
-                            Pin = model.Pin,
-                            SecurityQuestionAnswers = new[] 
+                            new 
                             {
-                                new 
-                                {
-                                    Answer = model.QuestionOneAnswer,
-                                    SecurityQuestionId = model.QuestionOneId,
-                                },
-                                new 
-                                {
-                                    Answer = model.QuestionTwoAnswer,
-                                    SecurityQuestionId = model.QuestionTwoId,
-                                },
-                                new 
-                                {
-                                    Answer = model.QuestionThreeAnswer,
-                                    SecurityQuestionId = model.QuestionThreeId,
-                                },
+                                Answer = model.QuestionOneAnswer,
+                                SecurityQuestionId = model.QuestionOneId,
                             },
-                            Username = model.Username,
+                            new 
+                            {
+                                Answer = model.QuestionTwoAnswer,
+                                SecurityQuestionId = model.QuestionTwoId,
+                            },
+                            new 
+                            {
+                                Answer = model.QuestionThreeAnswer,
+                                SecurityQuestionId = model.QuestionThreeId,
+                            },
                         },
-                        Profile = new
-                        {
-                            EmailAddress = model.EmailAddress,
-                            FirstName = model.FirstName,
-                            LastName = model.LastName,
-                        }
-                    };
+                        Username = model.Username,
+                    },
+                    Profile = new
+                    {
+                        EmailAddress = model.EmailAddress,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                    }
+                };
 
-                    ServicePointManager.UseNagleAlgorithm = false;
-                    ServicePointManager.ServerCertificateValidationCallback = (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
-                    var httpClient = new HttpClient();
+                using (var httpClient = new HttpClient())
+                {
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.DefaultRequestHeaders.Add("api-key", INAPIKEY);
-                    httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", INACCESSTOKEN);
+                    httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
+                    httpClient.DefaultRequestHeaders.Add("x-sts-accesstoken", accessToken);
                     var httpContent = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-                    var result = httpClient.PostAsync(INUSERSCREATEURL, httpContent).Result;
+                    var result = httpClient.PostAsync(createUserUrl, httpContent).Result;
 
                     if (result.IsSuccessStatusCode)
                     {
