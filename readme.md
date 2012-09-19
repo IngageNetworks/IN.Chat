@@ -36,7 +36,7 @@ Getting Started
 *   **Stock** Stock information
     * ```/stock <ticker>```
 *   **Weather** Weather information, current & forcasts
-    * ```/weather <city or zip code>```
+    * ```/weather <city,state>```
 
 About
 ---
@@ -52,7 +52,7 @@ About
 ###APIs
 * Authentication - [INgage Networks's API](http://developer.ingagenetworks.com/)
 * CI Command - [Jenkins's API]()
-* Face Me Command - http://stacheable.herokuapp.com & [faceup.me](http://faceup.me/)
+* Face Me Command - [faceup.me](http://faceup.me/)
 * Rally Command - [Rally's API](http://developer.rallydev.com/)
 * Stock Command - Yahoo's Finance API (undocumented)
-* Weather Command - Google's Weather API (undocumented)
+* Weather Command - [Open Weather Map API](http://openweathermap.org/wiki/API/JSON_API)

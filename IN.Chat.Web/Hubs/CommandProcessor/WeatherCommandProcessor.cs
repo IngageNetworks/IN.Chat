@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using IN.Chat.Web.Hubs.CommandProcessor.Core;
 using IN.Chat.Web.Hubs.Entities;
+using Newtonsoft.Json;
 
 namespace IN.Chat.Web.Hubs.CommandProcessor
 {
@@ -16,7 +17,7 @@ namespace IN.Chat.Web.Hubs.CommandProcessor
         private static Regex REGEX = new Regex("(?i)^(/weather )(me |at |for |in )?(.+)$");
         public string Name { get { return "Weather"; } }
         public string Description { get { return "Weather information, current & forcasts"; } }
-        public string[] Usage { get { return new string[] { "/weather <city or zip code>" }; } }
+        public string[] Usage { get { return new string[] { "/weather <city,state>" }; } }
 
         public bool CanProcess(Message message)
         {
@@ -34,7 +35,7 @@ namespace IN.Chat.Web.Hubs.CommandProcessor
 
         private string GetWeather(string location)
         {
-            const string url = "http://www.google.com/ig/api?weather={0}";
+            const string url = "http://openweathermap.org/data/2.1/find/name?q={0}";
             var formattedInformation = string.Empty;
 
             try
@@ -51,63 +52,34 @@ namespace IN.Chat.Web.Hubs.CommandProcessor
                 }
                 else
                 {
-                    var xml = XDocument.Parse(content);
+                    dynamic json = JsonConvert.DeserializeObject(content);
+                    var city = json.list[0];
+                    var name = (string)city.name;
+                    var temp_current = (double)city.main.temp;
+                    var temp_min = (double)city.main.temp_min;
+                    var temp_max = (double)city.main.temp_max;
+                    var humidity = (double)city.main.humidity;
+                    var date = (DateTime)city.date;
+                    var wind_speed = (double)city.wind.speed;
+                    var wind_degrees = (double)city.wind.deg;
+                    var description = (string)city.weather[0].description;
 
-                    if (xml.Root.HasElements)
-                    {
-                        var stringBuilder = new StringBuilder();
-                        var forecastInformation = xml.Root.Descendants("forecast_information");
-                        var currentConditions = xml.Root.Descendants("current_conditions");
-                        var forecastConditions = xml.Root.Descendants("forecast_conditions");
+                    var temp_current_C = temp_current - 273.15;
+                    var temp_current_F = 9.0 / 5.0 * temp_current_C + 32;
 
-                        if (forecastInformation.Any())
-                        {
-                            var city = forecastInformation.Descendants("city").First().Attribute("data").Value;
-                            stringBuilder.AppendLine(city);
-                        }
+                    var stringBuilder = new StringBuilder();
+                    stringBuilder.AppendLine(name);
+                    stringBuilder.AppendLine("---");
+                    stringBuilder.AppendLine(description);
+                    stringBuilder.AppendLine(string.Format("{0:F0}°F {1:F0}°C", temp_current_F, temp_current_C));
+                    stringBuilder.AppendLine(string.Format("{0:F0}% humidity", humidity));
 
-                        if (currentConditions.Any())
-                        {
-                            var condition = currentConditions.Descendants("condition").First().Attribute("data").Value;
-                            var ferinheight = currentConditions.Descendants("temp_f").First().Attribute("data").Value;
-                            var celsius = currentConditions.Descendants("temp_c").First().Attribute("data").Value;
-                            var humidity = currentConditions.Descendants("humidity").First().Attribute("data").Value;
-                            var windCondition = currentConditions.Descendants("wind_condition").First().Attribute("data").Value;
-
-                            stringBuilder.AppendLine();
-                            stringBuilder.AppendLine("Currently");
-                            stringBuilder.AppendLine(string.Format("{0}°F {1}°C {2}", ferinheight, celsius, condition));
-                            stringBuilder.AppendLine(humidity);
-                            stringBuilder.AppendLine(windCondition);
-                        }
-
-                        if (forecastConditions.Any())
-                        {
-                            stringBuilder.AppendLine();
-                            stringBuilder.AppendLine("Forecast");
-                            foreach (var forecastCondition in forecastConditions)
-                            {
-                                var dayOfWeek = forecastCondition.Descendants("day_of_week").First().Attribute("data").Value;
-                                var high = forecastCondition.Descendants("high").First().Attribute("data").Value;
-                                var low = forecastCondition.Descendants("low").First().Attribute("data").Value;
-                                var condition = forecastCondition.Descendants("condition").First().Attribute("data").Value;
-
-                                stringBuilder.AppendLine(string.Format("{0}: {1}° to {2}° {3}", dayOfWeek, high, low, condition));
-                            }
-                        }
-
-                        formattedInformation = stringBuilder.ToString();
-                    }
-
-                    if (string.IsNullOrWhiteSpace(formattedInformation))
-                    {
-                        formattedInformation = string.Format("Sorry, but I couldn't find {0}.", location);
-                    }
+                    formattedInformation = stringBuilder.ToString();
                 }
             }
             catch
             {
-                formattedInformation = "Sorry, I was unable to parse the weather data.";
+                formattedInformation = "Sorry, weather is unavaliable at the moment.";
             }
 
             return formattedInformation;

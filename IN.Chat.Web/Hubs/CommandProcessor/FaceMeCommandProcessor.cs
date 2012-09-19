@@ -56,31 +56,9 @@ namespace IN.Chat.Web.Hubs.robotProcessor
 
                 foreach (var url in urls)
                 {
-                    if (CanAccessorize(url))
-                    {
-                        message.ProcessedContent = String.Format("http://faceup.me/img.jpg?overlay={0}&src={1}", accessory, Uri.EscapeDataString(url));
-                    }
+                    message.ProcessedContent = String.Format("http://faceup.me/img.jpg?overlay={0}&src={1}", accessory, Uri.EscapeDataString(url));
                 }
             }
-        }
-
-        protected virtual bool CanAccessorize(string imageUrl)
-        {
-            var canStache = false;
-
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en-us"));
-            client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
-            var result = client.GetAsync(String.Format("http://stacheable.herokuapp.com?src={0}", Uri.EscapeDataString(imageUrl))).Result;
-
-            if (result.IsSuccessStatusCode)
-            {
-                var content = result.Content.ReadAsStringAsync().Result;
-                dynamic json = JsonConvert.DeserializeObject(content);
-                canStache = json.count.Value > 0;
-            }
-
-            return canStache;
         }
     }
 }
